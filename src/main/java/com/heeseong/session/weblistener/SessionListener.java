@@ -16,14 +16,13 @@ import java.util.Hashtable;
 public class SessionListener implements HttpSessionListener {
 
     public static SessionListener sessionListener = null;
-    private static Hashtable loginUsers = new Hashtable();
+    private static Hashtable loginSessionList = new Hashtable();
 
     /**
      * 싱글톤 생성
      * @return
      */
     public static synchronized SessionListener getInstance() {
-        log.info("getInstance 실행");
         if(sessionListener == null) {
             sessionListener = new SessionListener();
         }
@@ -38,12 +37,6 @@ public class SessionListener implements HttpSessionListener {
     public void sessionCreated(HttpSessionEvent httpSessionEvent) {
         log.info("sessionCreated {}", httpSessionEvent.getSession());
 
-        HttpSession session = httpSessionEvent.getSession();
-
-        synchronized(loginUsers) {
-            loginUsers.put(session.getId(), session);
-        }
-        currentSessionList();
     }
 
     /**
@@ -52,14 +45,14 @@ public class SessionListener implements HttpSessionListener {
      */
     @Override
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
-        log.info("sessionDestroyed userId {}", httpSessionEvent.getSession().getAttribute("userId"));
+        log.info("sessionDestroyed userId -> {}", httpSessionEvent.getSession().getAttribute("userId"));
     }
 
     /**
      * 현제 HashTable에 담겨 있는 유저 리스트, 즉 session list
      */
     private void currentSessionList(){
-        Enumeration elements = loginUsers.elements();
+        Enumeration elements = loginSessionList.elements();
         HttpSession session = null;
         while (elements.hasMoreElements()){
             session = (HttpSession)elements.nextElement();
@@ -67,7 +60,7 @@ public class SessionListener implements HttpSessionListener {
             String userId = (String)session.getAttribute("userId");
             log.info("currentSessionUserList -> userId {} ", userId);
             log.info("currentSessionUserList -> sessionId {} ", session.getId());
-            log.info("currentSessionUserList -> hashtable SessionList {} ", loginUsers.get(session.getId()));
+            log.info("currentSessionUserList -> hashtable SessionList {} ", loginSessionList.get(session.getId()));
         }
     }
 
@@ -77,10 +70,30 @@ public class SessionListener implements HttpSessionListener {
      * @param value
      */
     public void setSession(HttpServletRequest request, String value){
-        log.info("setSession 실행 {} ", value);
         HttpSession session = request.getSession();
         session.setAttribute("userId", value);
-        session.setMaxInactiveInterval(1);
+        session.setMaxInactiveInterval(0);
+
+        System.out.println(isLoginUser(value, request));
+        //HashMap에 Login에 성공한 유저 담기
+        synchronized(loginSessionList){
+            loginSessionList.put(session.getId(), session);
+        }
+
+        //currentSessionList();
+    }
+
+    public boolean isLoginUser(String loginUserId, HttpServletRequest request){
+        Enumeration elements = loginSessionList.elements();
+        HttpSession session = null;
+        while (elements.hasMoreElements()){
+            session = (HttpSession)elements.nextElement();
+            String userId = (String)session.getAttribute("userId");
+            if(loginUserId.equals(userId) && (!session.getId().equals(request.getSession().getId()))){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
