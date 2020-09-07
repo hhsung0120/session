@@ -35,8 +35,7 @@ public class SessionListener implements HttpSessionListener {
      */
     @Override
     public void sessionCreated(HttpSessionEvent httpSessionEvent) {
-        log.info("sessionCreated {}", httpSessionEvent.getSession());
-
+        log.info("sessionCreated -> {}", httpSessionEvent.getSession().getAttribute("userId"));
     }
 
     /**
@@ -46,6 +45,7 @@ public class SessionListener implements HttpSessionListener {
     @Override
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
         log.info("sessionDestroyed userId -> {}", httpSessionEvent.getSession().getAttribute("userId"));
+        this.removeSession(httpSessionEvent.getSession());
     }
 
     /**
@@ -59,8 +59,8 @@ public class SessionListener implements HttpSessionListener {
 
             String userId = (String)session.getAttribute("userId");
             log.info("currentSessionUserList -> userId {} ", userId);
-            log.info("currentSessionUserList -> sessionId {} ", session.getId());
-            log.info("currentSessionUserList -> hashtable SessionList {} ", loginSessionList.get(session.getId()));
+            //log.info("currentSessionUserList -> sessionId {} ", session.getId());
+            //log.info("currentSessionUserList -> hashtable SessionList {} ", loginSessionList.get(session.getId()));
         }
     }
 
@@ -72,17 +72,38 @@ public class SessionListener implements HttpSessionListener {
     public void setSession(HttpServletRequest request, String value){
         HttpSession session = request.getSession();
         session.setAttribute("userId", value);
-        session.setMaxInactiveInterval(0);
+        session.setMaxInactiveInterval(1);
 
         System.out.println(isLoginUser(value, request));
         //HashMap에 Login에 성공한 유저 담기
         synchronized(loginSessionList){
             loginSessionList.put(session.getId(), session);
         }
-
-        //currentSessionList();
+        currentSessionList();
     }
 
+    /**
+     * session 삭제
+     * @param session
+     */
+    public void removeSession(HttpSession session){
+        log.info("removeSession {} ", session.getAttribute("userId"));
+        session.removeAttribute("userId");
+        session.invalidate();
+
+        //로그아웃 유저 삭제
+        synchronized(loginSessionList){
+            loginSessionList.remove(session.getId());
+        }
+        currentSessionList();
+    }
+
+    /**
+     * 현재 로그인한 유저가 이미 존재 하는지 확인
+     * @param loginUserId
+     * @param request
+     * @return boolean
+     */
     public boolean isLoginUser(String loginUserId, HttpServletRequest request){
         Enumeration elements = loginSessionList.elements();
         HttpSession session = null;

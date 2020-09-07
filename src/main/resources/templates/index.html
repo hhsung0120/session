@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+</head>
+<body>
+인덱스 입니다.
+<input type="button" value="로그아웃" onclick="goLogout()"/>
+<script>
+    /*window.addEventListener('beforeunload', function (e) {
+        var confirmationMessage = "닫힘";
+        //goLogout();
+        (e || window.event).returnValue = confirmationMessage; //Webkit, Safari, Chrome
+        return confirmationMessage; //Gecko + IE
+    });*/
+    function goLogout(){
+        $.ajax({
+            type:"POST"
+            , dataType:'text'
+            , url:"/test/logout"
+            , success : function(data){
+                alert(data);
+            },error:function(x,error){
+                alert("처리중 오류가 발생했습니다.");
+            }
+        });
+    }
+</script>
+</body>
+</html>
