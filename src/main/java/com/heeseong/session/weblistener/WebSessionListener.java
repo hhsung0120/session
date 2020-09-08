@@ -74,7 +74,6 @@ public class WebSessionListener implements HttpSessionListener {
         session.setAttribute("userId", value);
         session.setMaxInactiveInterval(1);
 
-        System.out.println(isLoginUser(value, request));
         //HashMap에 Login에 성공한 유저 담기
         synchronized(loginSessionList){
             loginSessionList.put(session.getId(), session);
