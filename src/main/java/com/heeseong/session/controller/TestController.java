@@ -29,4 +29,22 @@ public class TestController {
         System.out.println("keepAlive -> " + request.getSession().getAttribute("userId"));
         return "";
     }
+
+    @ResponseBody
+    @GetMapping("/test/test1")
+    public String test1(){
+        return "test1";
+    }
+
+    @ResponseBody
+    @GetMapping("/test/test2")
+    public String test2(){
+        return "test2";
+    }
+
+    @ResponseBody
+    @GetMapping("/test/test3")
+    public String test3(){
+        return "test3";
+    }
 }

@@ -30,7 +30,7 @@ public class WebSessionListener implements HttpSessionListener {
     }
 
     /**
-     * HttpServletRequest 실행 되는 순간 호출
+     * session.setAttribute 실행 되는 순간 같은 sessionId 일경우 1회만 실행
      * @param httpSessionEvent
      */
     @Override
@@ -83,6 +83,7 @@ public class WebSessionListener implements HttpSessionListener {
      * @param value
      */
     public void setSession(HttpServletRequest request, String value){
+        log.info("setSession 실행");
         HttpSession session = request.getSession();
         session.setAttribute("userId", value);
         session.setMaxInactiveInterval(2);
@@ -96,7 +97,7 @@ public class WebSessionListener implements HttpSessionListener {
 
     /**
      * session 삭제
-     * 세션이 remove 되면 destroyed 함수가 실행된다.
+     * 세션이 remove 되면 destroyed 함수 실행
      * @param request
      */
     public void removeSession(HttpServletRequest request){
