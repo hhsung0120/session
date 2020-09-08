@@ -1,7 +1,6 @@
 package com.heeseong.session.weblistener;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
