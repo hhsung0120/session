@@ -13,18 +13,18 @@ import java.util.Hashtable;
 
 @Slf4j
 @Component
-public class SessionListener implements HttpSessionListener {
+public class WebSessionListener implements HttpSessionListener {
 
-    public static SessionListener sessionListener = null;
+    public static WebSessionListener sessionListener = null;
     private static Hashtable loginSessionList = new Hashtable();
 
     /**
      * 싱글톤 생성
      * @return
      */
-    public static synchronized SessionListener getInstance() {
+    public static synchronized WebSessionListener getInstance() {
         if(sessionListener == null) {
-            sessionListener = new SessionListener();
+            sessionListener = new WebSessionListener();
         }
         return sessionListener;
     }
