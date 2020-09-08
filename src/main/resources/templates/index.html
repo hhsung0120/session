@@ -6,8 +6,9 @@
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
 </head>
 <body>
-인덱스 입니다.
+인덱스 입니다. 버튼이 하나면 들어올때마다 눌립니다 body 에 input button 이 하나라서..
 <input type="button" value="로그아웃" onclick="goLogout()"/>
+<input type="button" value="걍버튼" />
 <script>
 
     var flag = true;
@@ -53,6 +54,7 @@
         console.log(flag);
         if(flag){
             console.log("로그아웃");
+            goLogout();
         }else{
             console.log("새로고침");
         }
@@ -64,6 +66,20 @@
             console.log("크롬 외 브라우저");
             //return "종료 하시겠습니까?";
         }*/
+    }
+    setInterval(keepAlive,1000);
+
+    function keepAlive(){
+        $.ajax({
+            type:"POST"
+            , dataType:'text'
+            , url:"/test/was/keepAlive"
+            , success : function(data){
+
+            },error:function(x,error){
+                alert("처리중 오류가 발생했습니다.");
+            }
+        });
     }
 
     function goLogout(){

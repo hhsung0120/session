@@ -14,7 +14,7 @@ public class SessionController {
     public String session(@PathVariable String userId
                         , HttpServletRequest request){
 
-        WebSessionListener.getInstance().setSession(request, userId);
+        //WebSessionListener.getInstance().setSession(request, userId);
         return "성공";
     }
 }

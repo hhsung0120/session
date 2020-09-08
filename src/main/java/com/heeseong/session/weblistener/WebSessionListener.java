@@ -1,6 +1,7 @@
 package com.heeseong.session.weblistener;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,8 +45,21 @@ public class WebSessionListener implements HttpSessionListener {
      */
     @Override
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
-        log.info("sessionDestroyed userId -> {}", httpSessionEvent.getSession().getAttribute("userId"));
-        this.removeSession(httpSessionEvent.getSession());
+        log.info("sessionDestroyed 실행");
+        HttpSession session = httpSessionEvent.getSession();
+
+        String userId = (String) session.getAttribute("userId");
+
+        //로그아웃 유저 삭제
+        synchronized(loginSessionList){
+            loginSessionList.remove(httpSessionEvent.getSession().getId());
+        }
+
+        if(userId != null){
+            this.updateUserCloseTime(userId);
+        }
+
+        currentSessionList();
     }
 
     /**
@@ -72,7 +86,7 @@ public class WebSessionListener implements HttpSessionListener {
     public void setSession(HttpServletRequest request, String value){
         HttpSession session = request.getSession();
         session.setAttribute("userId", value);
-        session.setMaxInactiveInterval(1);
+        session.setMaxInactiveInterval(2);
 
         //HashMap에 Login에 성공한 유저 담기
         synchronized(loginSessionList){
@@ -83,27 +97,40 @@ public class WebSessionListener implements HttpSessionListener {
 
     /**
      * session 삭제
-     * @param session
+     * 세션이 remove 되면 destroyed 함수가 실행된다.
+     * @param request
      */
-    public void removeSession(HttpSession session){
-        log.info("removeSession {} ", session.getAttribute("userId"));
+    public void removeSession(HttpServletRequest request){
+        log.info("removeSession 실행");
+
+        HttpSession session = request.getSession();
+        String userId = (String)session.getAttribute("userId");
+
         session.removeAttribute("userId");
         session.invalidate();
 
-        //로그아웃 유저 삭제
-        synchronized(loginSessionList){
-            loginSessionList.remove(session.getId());
+        if(userId != null){
+            this.updateUserCloseTime(userId);
         }
-        currentSessionList();
+    }
+
+    /**
+     * 유저 나간 시간 업데이트
+     * @param userId
+     */
+    private void updateUserCloseTime(String userId) {
+        log.info("updateUserCloseTime {} ", userId);
+        //호출부에서 NULL 검사
+        //업데이트 로직
     }
 
     /**
      * 현재 로그인한 유저가 이미 존재 하는지 확인
-     * @param loginUserId
      * @param request
+     * @param loginUserId
      * @return boolean
      */
-    public boolean isLoginUser(String loginUserId, HttpServletRequest request){
+    public boolean isLoginUser(HttpServletRequest request, String loginUserId){
         Enumeration elements = loginSessionList.elements();
         HttpSession session = null;
         while (elements.hasMoreElements()){

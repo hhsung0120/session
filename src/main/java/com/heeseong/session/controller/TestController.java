@@ -11,8 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 public class TestController {
 
     @GetMapping("/{userId}")
-    public String index(@PathVariable String userId
-                        , HttpServletRequest request){
+    public String index(@PathVariable String userId, HttpServletRequest request){
         WebSessionListener.getInstance().setSession(request, userId);
         return "index";
     }
@@ -20,7 +19,14 @@ public class TestController {
     @ResponseBody
     @PostMapping("/logout")
     public String logout(HttpServletRequest request){
-        WebSessionListener.getInstance().removeSession(request.getSession());
+        WebSessionListener.getInstance().removeSession(request);
         return "logout";
+    }
+
+    @ResponseBody
+    @PostMapping("/was/keepAlive")
+    public String keepAlive(HttpServletRequest request){
+        System.out.println("keepAlive -> " + request.getSession().getAttribute("userId"));
+        return "";
     }
 }
