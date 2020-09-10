@@ -72,7 +72,7 @@ public class WebSessionListener implements HttpSessionListener {
 
             String userId = (String)session.getAttribute("userId");
             log.info("currentSessionUserList -> userId {} ", userId);
-            //log.info("currentSessionUserList -> sessionId {} ", session.getId());
+            log.info("currentSessionUserList -> sessionId {} ", session.getId());
             //log.info("currentSessionUserList -> hashtable SessionList {} ", loginSessionList.get(session.getId()));
         }
     }
@@ -87,6 +87,7 @@ public class WebSessionListener implements HttpSessionListener {
         HttpSession session = request.getSession();
         session.setAttribute("userId", value);
         session.setMaxInactiveInterval(2);
+
 
         //HashMap에 Login에 성공한 유저 담기
         synchronized(loginSessionList){
@@ -118,7 +119,7 @@ public class WebSessionListener implements HttpSessionListener {
      * 유저 나간 시간 업데이트
      * @param userId
      */
-    private void updateUserCloseTime(String userId) {
+    private void updateUserCloseTime(String userId) throws NullPointerException{
         log.info("updateUserCloseTime {} ", userId);
         //호출부에서 NULL 검사
         //업데이트 로직
